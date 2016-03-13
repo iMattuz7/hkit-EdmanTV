@@ -1,22 +1,36 @@
 package com.edmantv.howknowit.hkit_edmantv;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+
+import android.util.Config;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-public class videoActivity extends AppCompatActivity {
 
+import com.google.android.youtube.player.YouTubeBaseActivity;
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayer.Provider;
+import com.google.android.youtube.player.YouTubePlayerView;
+
+public class videoActivity extends YouTubeBaseActivity implements YouTubePlayer.OnInitializedListener {
+    YouTubePlayerView youtubePlayerView;
+    private static final int RECOVERY_REQUEST = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
+        youtubePlayerView = (YouTubePlayerView)findViewById(R.id.youtube_view);
+        youtubePlayerView.initialize("AIzaSyBNblrE-k0xBGZpfFPVXAAOalztdwVc-Zk", this);
+
+       // Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        // setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -27,6 +41,34 @@ public class videoActivity extends AppCompatActivity {
             }
         });
     }
+    protected Provider getYouTubePlayerProvider() {
+        return youtubePlayerView;
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == RECOVERY_REQUEST) {
+            // Retry initialization if user performed a recovery action
+            getYouTubePlayerProvider().initialize("AIzaSyBNblrE-k0xBGZpfFPVXAAOalztdwVc-Zk", this);
+        }
+    }
+
+    @Override
+    public void onInitializationFailure(Provider provider, YouTubeInitializationResult errorReason) {
+        if (errorReason.isUserRecoverableError()) {
+            errorReason.getErrorDialog(this, RECOVERY_REQUEST).show();
+        } else {
+            String error = String.format(getString(R.string.player_error), errorReason.toString());
+            Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onInitializationSuccess(Provider provider, YouTubePlayer player, boolean wasRestored) {
+        if (!wasRestored) {
+            player.cueVideo("fhWaJi1Hsfo"); // Plays https://www.youtube.com/watch?v=fhWaJi1Hsfo
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

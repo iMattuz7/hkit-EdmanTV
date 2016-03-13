@@ -12,8 +12,9 @@
     tools:context="com.edmantv.howknowit.hkit_edmantv.videoActivity"
     tools:showIn="@layout/activity_video">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
+    <com.google.android.youtube.player.YouTubePlayerView
+        android:id="@+id/youtube_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
 </RelativeLayout>
